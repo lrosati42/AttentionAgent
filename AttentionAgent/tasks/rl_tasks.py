@@ -129,3 +129,30 @@ class CarRacingTask(RLTask):
         too_many_out_of_tracks = 0 < self._neg_reward_cap < self._neg_reward_cnt
         too_many_steps = 0 < self._max_steps <= self.step_cnt
         return done or too_many_out_of_tracks or too_many_steps
+
+@gin.configurable
+class CoinrunTask(RLTask):
+    """Procgen Coinrun-v0 task."""
+
+    def __init__(self, render=False, v=True, max_steps=5000):
+        super(CoinrunTask, self).__init__(v=v)
+        self._max_steps = max_steps
+        if render:
+            self.env = gym.make('procgen:procgen-coinrun-v0', render_mode="human")
+        else:
+            self.env = gym.make('procgen:procgen-coinrun-v0')
+
+    def reset_for_rollout(self):
+        return super(CoinrunTask, self).reset_for_rollout()
+
+    def modify_action(self, act):
+        return np.argmax(act) #the most likely
+
+    def modify_done(self, reward, done): #it shouldn't be necessary in coinrun
+        if self.eval_mode:
+            return done
+
+        too_many_steps = 0 < self._max_steps <= self.step_cnt
+        if too_many_steps: self.env.step(-1) #hard early stopping in procgen
+
+        return done or too_many_steps

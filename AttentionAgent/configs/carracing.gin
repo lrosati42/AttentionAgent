@@ -4,7 +4,8 @@ import tasks.rl_tasks
 
 
 # Solution configurations
-torch_solutions.AttentionAgent.image_size = 96
+torch_solutions.AttentionAgent.image_h = 96
+torch_solutions.AttentionAgent.image_w = 96
 torch_solutions.AttentionAgent.query_dim = 4
 torch_solutions.AttentionAgent.patch_size = 7
 torch_solutions.AttentionAgent.patch_stride = 4

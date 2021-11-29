@@ -70,6 +70,7 @@ class MLPSolution(BaseTorchSolution):
     def __init__(self, device, obs_dim, act_dim, hidden_dim, num_hidden_layers):
         super(MLPSolution, self).__init__(device=device)
         hiddens = []
+        #print("act_dim=",act_dim,"hidden_dim=",hidden_dim)
         for _ in range(num_hidden_layers):
             hiddens.extend([
                 nn.Linear(in_features=hidden_dim, out_features=hidden_dim),
@@ -98,7 +99,7 @@ class SelfAttention(nn.Module):
         super(SelfAttention, self).__init__()
         self._layers = []
 
-        self._fc_q = nn.Linear(data_dim, dim_q)
+        self._fc_q = nn.Linear(data_dim, dim_q) #query
         self._layers.append(self._fc_q)
         self._fc_k = nn.Linear(data_dim, dim_q)
         self._layers.append(self._fc_k)
@@ -123,14 +124,20 @@ class AttentionAgent(BaseTorchSolution):
 
     def __init__(self,
                  device,
-                 image_size=96,
+                 image_h=96, #height
+                 image_w=96, #width
+                 output_dim=3, #action_space dimension
+                 output_activation="tanh",
                  patch_size=7,
                  patch_stride=4,
                  query_dim=4,
-                 hidden_dim=16,
+                 hidden_dim=16, #controller
                  top_k=10):
         super(AttentionAgent, self).__init__(device=device)
-        self.image_size = image_size
+        self.image_h = image_h
+        self.image_w = image_w
+        self.output_dim = output_dim
+        self.output_activation = output_activation
         self.patch_size = patch_size
         self.patch_stride = patch_stride
         self.query_dim = query_dim
@@ -139,24 +146,26 @@ class AttentionAgent(BaseTorchSolution):
 
         self.transform = transforms.Compose([
             transforms.ToPILImage(),
-            transforms.Resize((image_size, image_size)),
+            transforms.Resize((self.image_h, self.image_w)),
             transforms.ToTensor(),
         ])
 
-        n = int((image_size - patch_size) / patch_stride + 1)
+        n1 = int((self.image_h - patch_size) / patch_stride + 1) #number of rows
+        n2 = int((self.image_w - patch_size) / patch_stride + 1) #number of columns
+
         offset = self.patch_size // 2
         patch_centers = []
-        for i in range(n):
+        for i in range(n1): #rows
             patch_center_row = offset + i * patch_stride
-            for j in range(n):
+            for j in range(n2): #columns
                 patch_center_col = offset + j * patch_stride
                 patch_centers.append([patch_center_row, patch_center_col])
         self.patch_centers = torch.tensor(patch_centers).float()
 
-        self.num_patches = n ** 2
+        self.num_patches = n1*n2 #number of patches
         print('num_patches = {}'.format(self.num_patches))
         self.attention = SelfAttention(
-            data_dim=3 * self.patch_size ** 2,
+            data_dim=3 * self.patch_size ** 2, #data is h,w,c (dim=3)
             dim_q=query_dim,
         )
         self.modules_to_learn.append(self.attention)
@@ -168,10 +177,16 @@ class AttentionAgent(BaseTorchSolution):
         )
         self.modules_to_learn.append(self.lstm)
 
-        self.output_fc = nn.Sequential(
-            nn.Linear(in_features=hidden_dim, out_features=3),
-            nn.Tanh(),
-        )
+        if self.output_activation=="tanh":
+            self.output_fc = nn.Sequential(
+                nn.Linear(in_features=hidden_dim, out_features=output_dim),
+                nn.Tanh(),
+            )
+        elif self.output_activation=="softmax":
+            self.output_fc = nn.Sequential(
+                nn.Linear(in_features=hidden_dim, out_features=output_dim),
+                nn.Softmax(dim=-1),
+            )
         self.modules_to_learn.append(self.output_fc)
 
         print('num_params={}'.format(self.get_params().size))
@@ -201,8 +216,9 @@ class AttentionAgent(BaseTorchSolution):
         top_k_ix = ix[:self.top_k]
 
         centers = self.patch_centers[top_k_ix]
+        centers.T[0] = centers.T[0] / self.image_h #normalize x dimension
+        centers.T[1] = centers.T[1] / self.image_w #normalize y dimension
         centers = centers.flatten(0, -1)
-        centers = centers / self.image_size
 
         if self.hx is None:
             self.hx = (
@@ -211,6 +227,7 @@ class AttentionAgent(BaseTorchSolution):
             )
         self.hx = self.lstm(centers.unsqueeze(0), self.hx)
         output = self.output_fc(self.hx[0]).squeeze(0)
+
         return output.cpu().numpy()
 
     def reset(self):

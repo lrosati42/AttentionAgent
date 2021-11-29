@@ -181,3 +181,21 @@ class BreakoutTask(RLTask):
 
     def reset_for_rollout(self):
         return super(BreakoutTask, self).reset_for_rollout()
+
+@gin.configurable
+class VisualCartpoleTask(RLTask):
+    """Classic control CartPole-v0 task with video stream as observation space."""
+
+    def __init__(self, render=True, v=True):
+        super(VisualCartpoleTask, self).__init__(v=v)
+        self.env = gym.make('CartPole-v0')
+        self.render = render
+
+    def modify_action(self, act):
+        return np.argmax(act) #the most likely
+
+    def reset_for_rollout(self):
+        return super(VisualCartpoleTask, self).reset_for_rollout()
+
+    def modify_obs(self, obs):
+        return self.env.render('rgb_array') #rgb image as observation_space

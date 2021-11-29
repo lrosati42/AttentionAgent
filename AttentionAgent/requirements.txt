@@ -1,6 +1,9 @@
 cma
 gin-config
-gym[box2d]==0.15.3
+gym[box2d]
+gym[atari]
+procgen
 torch
 torchvision
 opencv-python
+#autorom #for Atari Roms: https://pypi.org/project/AutoROM/

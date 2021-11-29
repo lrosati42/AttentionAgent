@@ -53,6 +53,11 @@ class RLTask(BaseTask):
         self.show_gui()
         ep_reward = 0
         done = False
+
+        if isinstance(self, BreakoutTask):
+            self.env.step(1) #starts the ball
+            lives = 5 #starts with 5 lives
+
         while not done:
             action = solution.get_action(obs)
             action = self.modify_action(action)
@@ -63,6 +68,11 @@ class RLTask(BaseTask):
             self.step_cnt += 1
             ep_reward += reward
             self.show_gui()
+            if isinstance(self, BreakoutTask):
+                if lives > info['ale.lives']:
+                    self.env.step(1) #restarts the ball
+                    self.env.step(1) #sometimes two presses are needed...
+                    lives = info['ale.lives']
 
         time_cost = time.time() - start_time
         if self.verbose:
@@ -156,3 +166,18 @@ class CoinrunTask(RLTask):
         if too_many_steps: self.env.step(-1) #hard early stopping in procgen
 
         return done or too_many_steps
+
+@gin.configurable
+class BreakoutTask(RLTask):
+    """Atari Breakout-v0 task."""
+
+    def __init__(self, render=True, v=True):
+        super(BreakoutTask, self).__init__(v=v)
+        self.env = gym.make('Breakout-v0')
+        self.render = render
+
+    def modify_action(self, act):
+        return np.argmax(act) #the most likely
+
+    def reset_for_rollout(self):
+        return super(BreakoutTask, self).reset_for_rollout()

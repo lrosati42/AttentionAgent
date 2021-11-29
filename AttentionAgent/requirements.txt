@@ -1,9 +1,12 @@
+atari-py==0.2.9
+box2d-py==2.3.8
 cma
 gin-config
-gym[box2d]
-gym[atari]
-procgen
+gym==0.15.3
+gym3==0.3.3
+matplotlib
+opencv-python
+procgen==0.10.4
 torch
 torchvision
-opencv-python
-#autorom #for Atari Roms: https://pypi.org/project/AutoROM/
+#autorom #for Atari Roms: https://pypi.org/project/AutoROM/ and https://github.com/openai/atari-py#roms

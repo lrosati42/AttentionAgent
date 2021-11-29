@@ -161,7 +161,7 @@ class CoinrunTask(RLTask):
     def modify_action(self, act):
         return np.argmax(act) #the most likely
 
-    def modify_done(self, reward, done): #it shouldn't be necessary in coinrun
+    def modify_done(self, reward, done):
         if self.eval_mode:
             return done
 

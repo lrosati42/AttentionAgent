@@ -20,7 +20,10 @@ class RLTask(BaseTask):
         self.step_cnt = 0
 
     def seed(self, seed=None):
-        return self.env.seed(seed)
+        if isinstance(self, CoinrunTask):
+            self.env.seed = seed
+        else:
+            return self.env.seed(seed)
 
     def modify_obs(self, obs):
         return obs

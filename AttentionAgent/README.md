@@ -3,7 +3,17 @@
 ![attentionagent](https://storage.googleapis.com/quickdraw-models/sketchRNN/attention/assets/card/attentionagent.gif)  
 Our agent receives visual input as a stream of 96x96px RGB images (left). Each image frame is passed through a self-attention bottleneck module, responsible for selecting K=10 patches (highlighted in white, middle). Features from these K patches (such as location) are then routed to a decision-making controller (right) that will produce the agent’s next action. The parameters of the self-attention module and the controller are trained together using neuroevolution.
 
-This repository contains the code to reproduce the results presented in the orignal [paper](https://attentionagent.github.io/). 
+This repository contains the code to reproduce the results presented in the orignal [paper](https://attentionagent.github.io/).
+
+## Additional informations
+
+This code has been tested on python 3.7.
+
+It includes three new tasks:
+
+    -Visual version of the classic CartPole task (https://gym.openai.com/envs/CartPole-v0/)
+    -Atari Breakout (https://gym.openai.com/envs/Breakout-v0/ , you may need to install the Atari ROM to use it, see last line in the requirements)
+    -Procgen Coinrun (https://openai.com/blog/procgen-benchmark/)
 
 ## Evaluate pre-trained models
 
@@ -28,6 +38,15 @@ python train_agent.py --config=configs/carracing.gin --log-dir=log/carracing --r
 
 # Train CartPole locally on GPUs.
 python train_agent.py --config=configs/cartpole.gin --log-dir=log/cartpole --num-gpus=8
+
+# Train the Visual Cartpole locally.
+python train_agent.py --config=configs/visualcartpole.gin --log-dir=log/visualcartpole
+
+# Train Breakout locally.
+python train_agent.py --config=configs/breakout.gin --log-dir=log/breakout
+
+# Train Coinrun locally.
+python train_agent.py --config=configs/coinrun.gin --log-dir=log/coinrun
 ```
 Please see `train_agent.py` for other command line options.
 

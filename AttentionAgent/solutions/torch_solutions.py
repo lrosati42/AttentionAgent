@@ -216,8 +216,8 @@ class AttentionAgent(BaseTorchSolution):
         top_k_ix = ix[:self.top_k]
 
         centers = self.patch_centers[top_k_ix]
-        centers.T[0] = centers.T[0] / self.image_h #normalize x dimension
-        centers.T[1] = centers.T[1] / self.image_w #normalize y dimension
+        centers.T[0] = centers.T[0] / self.image_h #normalize row dimension
+        centers.T[1] = centers.T[1] / self.image_w #normalize column dimension
         centers = centers.flatten(0, -1)
 
         if self.hx is None:

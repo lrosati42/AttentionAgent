@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torchvision.transforms import transforms
 from solutions.base_solution import BaseSolution
-
+import cv2
 
 torch.set_num_threads(1)
 
@@ -171,8 +171,9 @@ class AttentionAgent(BaseTorchSolution):
         self.modules_to_learn.append(self.attention)
 
         self.hx = None
+
         self.lstm = nn.LSTMCell(
-            input_size=self.top_k * 2,
+            input_size=self.top_k *3 *4, #patch histogram has 3 (channels) * b (bin)
             hidden_size=hidden_dim,
         )
         self.modules_to_learn.append(self.lstm)
@@ -190,6 +191,19 @@ class AttentionAgent(BaseTorchSolution):
         self.modules_to_learn.append(self.output_fc)
 
         print('num_params={}'.format(self.get_params().size))
+
+    def get_patches_histogram(self, patches, bins=256): #patches is a torch.tensor of shape (10,7,7,3)
+        k, m, _, c = patches.shape
+        patches_hist = torch.zeros([k, bins, c])
+
+        for p in range(k):
+            rk, gk, bk = cv2.split(patches[p].numpy()*255)
+            rk_hist = torch.tensor(cv2.calcHist([rk], [0], None, [bins], [0,256])).squeeze() #3 tensors of shape [bins]
+            gk_hist = torch.tensor(cv2.calcHist([gk], [0], None, [bins], [0,256])).squeeze()
+            bk_hist = torch.tensor(cv2.calcHist([bk], [0], None, [bins], [0,256])).squeeze()
+            patches_hist[p] = torch.stack([rk_hist, gk_hist, bk_hist], dim=-1) #a tensor of shape [bins,c]
+
+        return patches_hist
 
     def _get_action(self, obs):
         # ob.shape = (h, w, c)
@@ -215,18 +229,16 @@ class AttentionAgent(BaseTorchSolution):
         ix = torch.argsort(patch_importance, descending=True)
         top_k_ix = ix[:self.top_k]
 
-        centers = self.patch_centers[top_k_ix]
-        centers.T[0] = centers.T[0] / self.image_h #normalize row dimension
-        centers.T[1] = centers.T[1] / self.image_w #normalize column dimension
-        centers = centers.flatten(0, -1)
+        patches_hist = self.get_patches_histogram(patches[top_k_ix], bins=4)
+        patches_hist = patches_hist.flatten(0,-1)
 
         if self.hx is None:
             self.hx = (
                 torch.zeros(1, self.hidden_dim),
                 torch.zeros(1, self.hidden_dim),
             )
-        self.hx = self.lstm(centers.unsqueeze(0), self.hx)
-        output = self.output_fc(self.hx[0]).squeeze(0)
+        self.hx = self.lstm(patches_hist.unsqueeze(0), self.hx)
+        output = self.output_fc(self.hx[0])
 
         return output.cpu().numpy()
 

@@ -9,4 +9,5 @@ opencv-python
 procgen==0.10.4
 torch
 torchvision
+moderngl
 #autorom #for Atari Roms: https://pypi.org/project/AutoROM/ and https://github.com/openai/atari-py#roms

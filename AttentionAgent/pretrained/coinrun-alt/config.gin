@@ -1,0 +1,23 @@
+import util
+import solutions.torch_solutions
+import tasks.rl_tasks
+
+
+# Solution configurations
+torch_solutions.AttentionAgent.image_h = 64
+torch_solutions.AttentionAgent.image_w = 64
+torch_solutions.AttentionAgent.output_dim = 15
+torch_solutions.AttentionAgent.output_activation = "softmax"
+torch_solutions.AttentionAgent.query_dim = 4
+torch_solutions.AttentionAgent.patch_size = 7
+torch_solutions.AttentionAgent.patch_stride = 4
+torch_solutions.AttentionAgent.hidden_dim = 16
+torch_solutions.AttentionAgent.top_k = 10
+util.create_solution.solution_loader = @torch_solutions.AttentionAgent
+
+
+# Task configurations
+rl_tasks.CoinrunTask.render = False
+rl_tasks.CoinrunTask.v = False
+rl_tasks.CoinrunTask.max_steps = 2000
+util.create_task.task_loader = @rl_tasks.CoinrunTask()

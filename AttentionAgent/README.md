@@ -1,7 +1,12 @@
 # Neuroevolution of Self-Interpretable Agents (Simplified)
 
-![attentionagent](https://storage.googleapis.com/quickdraw-models/sketchRNN/attention/assets/card/attentionagent.gif)  
-Our agent receives visual input as a stream of 96x96px RGB images (left). Each image frame is passed through a self-attention bottleneck module, responsible for selecting K=10 patches (highlighted in white, middle). Features from these K patches (such as location) are then routed to a decision-making controller (right) that will produce the agent’s next action. The parameters of the self-attention module and the controller are trained together using neuroevolution.
+![attentionagent](https://storage.googleapis.com/quickdraw-models/sketchRNN/attention/assets/card/attentionagent.gif) 
+![coinrun](https://media.giphy.com/media/HFmrCrvXS9QRFAfjZa/giphy.gif)
+![breakout](https://media.giphy.com/media/3jU4sxm4Mc7LYWuOA5/giphy.gif)
+
+![vcartpole](https://media.giphy.com/media/jtGtJq5zWKuyPM3xQS/giphy.gif)
+
+Our agent receives visual input as a stream of RGB images. Each image frame is passed through a self-attention bottleneck module, responsible for selecting K=10 patches. Features from these K patches (such as location) are then routed to a decision-making controller that will produce the agent’s next action. The parameters of the self-attention module and the controller are trained together using neuroevolution.
 
 This repository contains the code to reproduce the results presented in the orignal [paper](https://attentionagent.github.io/).
 
@@ -25,8 +30,14 @@ python eval_agent.py --log-dir=pretrained/carracing --n-episodes=100
 # Evaluate CarRacing with GUI.
 python eval_agent.py --log-dir=pretrained/carracing --render
 
-# Evaluate CartPole with GUI.
-python eval_agent.py --log-dir=pretrained/cartpole --render
+# Evaluate Procgen Coinrun.
+python eval_agent.py --log-dir=pretrained/coinrun
+
+# Evaluate Atari Breakout.
+python eval_agent.py --log-dir=pretrained/breakout --render
+
+# Evaluate visual CartPole with GUI.
+python eval_agent.py --log-dir=pretrained/visual-cartpole --render
 ```
 
 ## Training

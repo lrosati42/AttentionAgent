@@ -1,10 +1,14 @@
 # Neuroevolution of Self-Interpretable Agents (Simplified)
 
 ![attentionagent](https://storage.googleapis.com/quickdraw-models/sketchRNN/attention/assets/card/attentionagent.gif) 
-![coinrun](https://media.giphy.com/media/HFmrCrvXS9QRFAfjZa/giphy.gif)
+![coinrun](https://media.giphy.com/media/ueNQ2HILL5nnaY0I7J/giphy-downsized.gif)
 ![breakout](https://media.giphy.com/media/3jU4sxm4Mc7LYWuOA5/giphy.gif)
 
+CarRacing &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Coinrun &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Breakout
+
 ![vcartpole](https://media.giphy.com/media/jtGtJq5zWKuyPM3xQS/giphy.gif)
+
+Visual-CartPole
 
 Our agent receives visual input as a stream of RGB images. Each image frame is passed through a self-attention bottleneck module, responsible for selecting K=10 patches. Features from these K patches (such as location) are then routed to a decision-making controller that will produce the agent’s next action. The parameters of the self-attention module and the controller are trained together using neuroevolution.
 
@@ -60,21 +64,3 @@ python train_agent.py --config=configs/breakout.gin --log-dir=log/breakout
 python train_agent.py --config=configs/coinrun.gin --log-dir=log/coinrun
 ```
 Please see `train_agent.py` for other command line options.
-
-## Citation
-For attribution in academic contexts, please cite this work as
-
-```
-@inproceedings{attentionagent2020,
-  author    = {Yujin Tang and Duong Nguyen and David Ha},
-  title     = {Neuroevolution of Self-Interpretable Agents},
-  booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference},
-  url       = {https://attentionagent.github.io},
-  note      = "\url{https://attentionagent.github.io}",
-  year      = {2020}
-}
-```
-
-## Disclaimer
-
-This is not an official Google product.

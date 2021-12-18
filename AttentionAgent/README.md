@@ -40,7 +40,7 @@ python eval_agent.py --log-dir=pretrained/coinrun
 # Evaluate Atari Breakout.
 python eval_agent.py --log-dir=pretrained/breakout --render
 
-# Evaluate visual CartPole with GUI.
+# Evaluate Visual CartPole with GUI.
 python eval_agent.py --log-dir=pretrained/visual-cartpole --render
 ```
 
@@ -51,10 +51,7 @@ To train on a local machine, run the following command:
 # Train CarRacing locally.
 python train_agent.py --config=configs/carracing.gin --log-dir=log/carracing --reps=3
 
-# Train CartPole locally on GPUs.
-python train_agent.py --config=configs/cartpole.gin --log-dir=log/cartpole --num-gpus=8
-
-# Train the Visual Cartpole locally.
+# Train the Visual CartPole locally.
 python train_agent.py --config=configs/visualcartpole.gin --log-dir=log/visualcartpole
 
 # Train Breakout locally.
